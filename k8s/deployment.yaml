@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pr-checks-demo
+  namespace: pr-checks-demo
   labels:
     app: pr-checks-demo
 spec:
@@ -22,7 +23,10 @@ spec:
           type: RuntimeDefault
       containers:
         - name: app
-          image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/pr-checks-demo:0.1.0
+          # Placeholder account ID and digest: CI should substitute the real image digest
+          # (for example from `terraform output repository_url` plus the pushed image digest).
+          image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/pr-checks-demo@sha256:0000000000000000000000000000000000000000000000000000000000000000
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
           securityContext:

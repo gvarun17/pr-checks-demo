@@ -1,0 +1,8 @@
+title = "pr-checks-demo gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Placeholder values used in example manifests"
+regexes = ['''123456789012''']

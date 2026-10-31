@@ -1,0 +1,28 @@
+# Place at .github/CODEOWNERS
+# Last matching pattern wins. Replace org/team names with your own.
+
+# Default owners for everything
+*                       @your-org/engineering
+
+# Application code
+/src/                   @your-org/backend
+/tests/                 @your-org/backend
+
+# Infrastructure as code
+/terraform/             @your-org/platform @your-org/security
+/cloudformation/        @your-org/platform @your-org/security
+/k8s/                   @your-org/platform
+/helm/                  @your-org/platform
+
+# CI/CD and repo governance (sensitive: changes affect every PR)
+/.github/               @your-org/platform
+/.github/CODEOWNERS     @your-org/platform @your-org/engineering-leads
+
+# Container builds and dependencies
+Dockerfile*             @your-org/platform
+uv.lock                 @your-org/backend @your-org/security
+pyproject.toml          @your-org/backend @your-org/security
+
+# Observability
+/monitoring/            @your-org/sre
+/dashboards/            @your-org/sre
