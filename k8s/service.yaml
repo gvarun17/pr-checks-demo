@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pr-checks-demo
+  labels:
+    app: pr-checks-demo
+spec:
+  selector:
+    app: pr-checks-demo
+  ports:
+    - port: 80
+      targetPort: 8000
+  type: ClusterIP
