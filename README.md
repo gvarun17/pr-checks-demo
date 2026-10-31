@@ -15,7 +15,9 @@ tests/test_main.py            # pytest suite
 Dockerfile                    # non-root, slim image
 terraform/                    # ECR repo (KMS-encrypted, immutable tags, scan on push)
 k8s/                          # Deployment + Service (hardened security context)
-pyproject.toml                # ruff, mypy (strict), pytest config
+pyproject.toml                # dependencies (uv), ruff, mypy (strict), pytest config
+uv.lock                       # locked, reproducible dependency versions
+.python-version               # Python version used by uv locally and in CI
 ```
 
 ## What each job checks
@@ -36,12 +38,20 @@ pyproject.toml                # ruff, mypy (strict), pytest config
 ## Run the checks locally
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt -r requirements-dev.txt
+# Install uv once: https://docs.astral.sh/uv/getting-started/installation/
+uv sync                      # creates .venv from uv.lock (runtime + dev groups)
 
-ruff check . && ruff format --check .
-mypy src/
-pytest --cov=src --cov-fail-under=80
+uv run ruff check . && uv run ruff format --check .
+uv run mypy src/
+uv run pytest --cov=src --cov-fail-under=80
+
+# Run the API locally
+uv run uvicorn app.main:app --reload --app-dir src
+
+# Add or upgrade dependencies (commit the updated uv.lock)
+uv add <package>             # runtime dependency
+uv add --dev <package>       # dev-only dependency
+uv lock --upgrade            # refresh all locked versions
 
 # Optional, if installed
 terraform -chdir=terraform fmt -check -recursive
@@ -74,7 +84,8 @@ trivy image --severity CRITICAL,HIGH --ignore-unfixed pr-checks-demo
 | Remove `readOnlyRootFilesystem` / add `privileged: true` in k8s | `iac-scan` (Checkov) |
 | Add `runAsUser: 0` or `USER root` in Dockerfile | `iac-scan` (Checkov) |
 | Set `image_tag_mutability = "MUTABLE"` in Terraform | `iac-scan` (Checkov) |
-| Pin an old vulnerable package in `requirements.txt` | `dependency-review` / `container-scan` |
+| Pin an old vulnerable package in `pyproject.toml` and re-run `uv lock` | `dependency-review` / `container-scan` |
+| Edit `pyproject.toml` dependencies without re-running `uv lock` | `lint-test` (`uv lock --check`) |
 
 ## Notes
 
