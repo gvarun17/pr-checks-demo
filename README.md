@@ -90,4 +90,8 @@ trivy image --severity CRITICAL,HIGH --ignore-unfixed pr-checks-demo
 ## Notes
 
 - Third-party actions are pinned to major tags for readability. In production, pin to commit SHAs.
-- The image reference in `k8s/deployment.yaml` uses a placeholder AWS account ID.
+- The image reference in `k8s/deployment.yaml` uses a placeholder AWS account ID and an all-zero
+  digest (Checkov requires images to be pinned by digest). Substitute the real digest at deploy time.
+- Manifests live in the `pr-checks-demo` namespace and ship with a NetworkPolicy (ingress on 8000,
+  DNS-only egress), which Checkov also requires.
+- Run the IaC scan locally with `uvx checkov -d . --framework terraform,kubernetes,dockerfile`.
